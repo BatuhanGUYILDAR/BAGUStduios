@@ -4,7 +4,7 @@ export type Product = {
   shortDescription: string;
   longDescription: string;
   image: string;
-  video?: string;
+  youtubeVideoId?: string;
   price: string;
   category: string;
   tags: string[];

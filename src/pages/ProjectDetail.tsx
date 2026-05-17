@@ -79,19 +79,18 @@ function ProjectDetail() {
             </div>
           </div>
         </div>
-        {localizedProduct.video && (
+        {localizedProduct.youtubeVideoId && (
           <div className="mt-12">
             <p className="section-kicker">{t.projectDetail.videoKicker}</p>
             <div className="mt-5 overflow-hidden rounded-lg border border-white/10 bg-black shadow-2xl shadow-black/40">
-              <video
-                className="aspect-video w-full bg-black object-contain"
-                controls
-                playsInline
-                preload="metadata"
-                poster={localizedProduct.image}
-              >
-                <source src={localizedProduct.video} type="video/mp4" />
-              </video>
+              <iframe
+                className="aspect-video w-full"
+                src={`https://www.youtube.com/embed/${localizedProduct.youtubeVideoId}`}
+                title={`${localizedProduct.title} demo video`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
             </div>
           </div>
         )}
