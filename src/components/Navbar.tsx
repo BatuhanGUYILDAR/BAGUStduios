@@ -126,9 +126,12 @@ function Navbar() {
     >
       <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" aria-label={t.nav.ariaLabel}>
         <NavLink to="/" className="flex items-center gap-3" onClick={() => setIsOpen(false)}>
-          <span className="grid h-11 w-11 place-items-center rounded-md bg-gradient-to-br from-neon-blue to-neon-violet text-lg font-black text-white shadow-neon">
-            B
-          </span>
+          <img
+            src="/images/bagu-mark.png?v=4"
+            alt=""
+            aria-hidden="true"
+            className="h-12 w-12 shrink-0 rounded-md object-cover shadow-neon"
+          />
           <span>
             <span className="block text-base font-black text-white">BAGU Studio</span>
             <span className="block text-xs uppercase tracking-[0.22em] text-slate-400">Game Dev</span>
