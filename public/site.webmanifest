@@ -1,0 +1,22 @@
+{
+  "name": "BAGU Studio",
+  "short_name": "BAGU Studio",
+  "description": "Game developer portfolio for Unreal Engine Blueprint systems and marketplace assets.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f2747",
+  "theme_color": "#0f2747",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/bagu-mark.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
