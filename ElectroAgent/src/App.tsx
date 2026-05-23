@@ -55,11 +55,27 @@ export default function App() {
   }, [setStatus]);
 
   useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
+
     try {
-      return subscribeToEvents(addEvent, mergeStatus);
+      subscribeToEvents(addEvent, mergeStatus)
+        .then((unsubscribe) => {
+          if (cancelled) {
+            unsubscribe();
+            return;
+          }
+          cleanup = unsubscribe;
+        })
+        .catch(() => undefined);
     } catch {
-      return undefined;
+      cleanup = undefined;
     }
+
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
   }, [addEvent, mergeStatus]);
 
   useEffect(() => {

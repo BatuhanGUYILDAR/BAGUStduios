@@ -34,13 +34,19 @@ class MemoryStore:
             "timestamp": datetime.utcnow().isoformat(),
         }
         if self.collection:
-            self.collection.add(ids=[memory_id], documents=[text], metadatas=[metadata])
-            mode = "chromadb"
+            try:
+                self.collection.add(ids=[memory_id], documents=[text], metadatas=[metadata])
+                mode = "chromadb"
+            except Exception:
+                mode = "unavailable"
         else:
-            with self.fallback_path.open("a", encoding="utf-8") as handle:
-                handle.write(json.dumps(record, ensure_ascii=True) + "\n")
-            mode = "jsonl"
-        return {"stored": True, "id": memory_id, "mode": mode}
+            try:
+                with self.fallback_path.open("a", encoding="utf-8") as handle:
+                    handle.write(json.dumps(record, ensure_ascii=True) + "\n")
+                mode = "jsonl"
+            except OSError:
+                mode = "unavailable"
+        return {"stored": mode != "unavailable", "id": memory_id, "mode": mode}
 
     def recall(self, query: str, limit: int = 5) -> list[dict[str, Any]]:
         if self.collection:
@@ -52,12 +58,15 @@ class MemoryStore:
         if not self.fallback_path.exists():
             return []
         rows = []
-        with self.fallback_path.open("r", encoding="utf-8") as handle:
-            for line in handle:
-                try:
-                    record = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                if query.lower() in record.get("text", "").lower():
-                    rows.append(record)
+        try:
+            with self.fallback_path.open("r", encoding="utf-8") as handle:
+                for line in handle:
+                    try:
+                        record = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if query.lower() in record.get("text", "").lower():
+                        rows.append(record)
+        except OSError:
+            return []
         return rows[-limit:]

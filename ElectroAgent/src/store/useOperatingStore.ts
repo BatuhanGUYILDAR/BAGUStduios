@@ -115,9 +115,15 @@ export const useOperatingStore = create<OperatingStore>((set) => ({
       ],
     })),
   addEvent: (event) =>
-    set((state) => ({
-      events: [...state.events.slice(-10), event],
-    })),
+    set((state) => {
+      if (state.events.some((existingEvent) => existingEvent.id === event.id)) {
+        return state;
+      }
+
+      return {
+        events: [...state.events.slice(-10), event],
+      };
+    }),
   upsertTask: (task) =>
     set((state) => ({
       tasks: [task, ...state.tasks.filter((item) => item.id !== task.id)].slice(0, 5),

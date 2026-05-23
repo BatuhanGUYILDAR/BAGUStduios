@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import urllib.request
+from typing import Any
 from dataclasses import dataclass
 
 from .schemas import OllamaStatus
@@ -48,3 +49,29 @@ class ModelRouter:
                 if not available or profile.name in available or base in installed:
                     return installed.get(base, profile.name)
         return available[0] if available else "qwen3:8b"
+
+    def generate_text(self, prompt: str, role: str = "light_planning", timeout: float = 8.0) -> str | None:
+        status = self.status()
+        if not status.online:
+            return None
+
+        model = self.select_model(role, status.models)
+        payload: dict[str, Any] = {
+            "model": model,
+            "prompt": prompt,
+            "stream": False,
+            "options": {"temperature": 0.1},
+        }
+        request = urllib.request.Request(
+            "http://127.0.0.1:11434/api/generate",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                data = json.loads(response.read().decode("utf-8"))
+            text = data.get("response")
+            return text if isinstance(text, str) and text.strip() else None
+        except Exception:
+            return None

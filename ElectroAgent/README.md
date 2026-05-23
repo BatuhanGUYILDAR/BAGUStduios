@@ -34,6 +34,14 @@ npm run dev
 
 The UI runs at `http://127.0.0.1:5173`, the local core runs at `http://127.0.0.1:8710`, and Electron hosts the native desktop shell.
 
+Do not run `npm run dev:backend` while `npm run dev` is already running. The desktop app starts the backend itself. If you start a second backend on the same port, Windows can show:
+
+```txt
+WinError 10013
+```
+
+That usually means the port is already in use, not that the app needs a special "core permission".
+
 Install optional desktop automation packages only when you are ready to enable screenshot OCR, ChromaDB, Playwright, and native control:
 
 ```bash

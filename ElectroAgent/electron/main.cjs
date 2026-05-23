@@ -1,12 +1,15 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs');
+const http = require('node:http');
+const net = require('node:net');
 const { spawn } = require('node:child_process');
 
 let mainWindow = null;
 let backendProcess = null;
 
-const backendPort = 8710;
+const preferredBackendPort = Number(process.env.ELECTRO_AGENT_BACKEND_PORT || 8710);
+let backendPort = preferredBackendPort;
 const rendererUrl = process.env.ELECTRON_RENDERER_URL;
 
 function pythonExecutable() {
@@ -25,8 +28,61 @@ function pythonExecutable() {
   });
 }
 
-function startBackend() {
+function checkBackendHealth(port) {
+  return new Promise((resolve) => {
+    const request = http.get(
+      {
+        host: '127.0.0.1',
+        port,
+        path: '/health',
+        timeout: 650,
+      },
+      (response) => {
+        response.resume();
+        resolve(response.statusCode === 200);
+      },
+    );
+
+    request.on('timeout', () => {
+      request.destroy();
+      resolve(false);
+    });
+    request.on('error', () => resolve(false));
+  });
+}
+
+function canListen(port) {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    server.once('error', () => resolve(false));
+    server.once('listening', () => {
+      server.close(() => resolve(true));
+    });
+    server.listen(port, '127.0.0.1');
+  });
+}
+
+async function findBackendPort() {
+  if (await checkBackendHealth(preferredBackendPort)) {
+    return preferredBackendPort;
+  }
+
+  for (let port = preferredBackendPort; port < preferredBackendPort + 40; port += 1) {
+    if (await canListen(port)) {
+      return port;
+    }
+  }
+
+  throw new Error('No local backend port is available.');
+}
+
+async function startBackend() {
   if (backendProcess) {
+    return;
+  }
+
+  backendPort = await findBackendPort();
+  if (await checkBackendHealth(backendPort)) {
     return;
   }
 
@@ -40,6 +96,7 @@ function startBackend() {
     env: {
       ...process.env,
       ELECTRO_AGENT_DESKTOP: '1',
+      ELECTRO_AGENT_BACKEND_PORT: String(backendPort),
     },
   });
 
@@ -86,8 +143,8 @@ function createWindow() {
   }
 }
 
-app.whenReady().then(() => {
-  startBackend();
+app.whenReady().then(async () => {
+  await startBackend();
   createWindow();
 
   app.on('activate', () => {

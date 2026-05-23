@@ -1,8 +1,20 @@
 import type { AgentEvent, GoalResponse, SystemStatus } from '../types';
 
-const backendUrl = 'http://127.0.0.1:8710';
+const fallbackBackendUrl = 'http://127.0.0.1:8710';
+let backendUrlPromise: Promise<string> | null = null;
+
+async function getBackendUrl(): Promise<string> {
+  if (!backendUrlPromise) {
+    backendUrlPromise = window.electro?.platform
+      ? window.electro.platform().then((platform) => platform.backendUrl || fallbackBackendUrl).catch(() => fallbackBackendUrl)
+      : Promise.resolve(fallbackBackendUrl);
+  }
+
+  return backendUrlPromise;
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const backendUrl = await getBackendUrl();
   const response = await fetch(`${backendUrl}${path}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -29,8 +41,10 @@ export async function executeGoal(goal: string): Promise<GoalResponse> {
   });
 }
 
-export function subscribeToEvents(onEvent: (event: AgentEvent) => void, onState?: (state: Partial<SystemStatus>) => void) {
-  const socket = new WebSocket('ws://127.0.0.1:8710/ws/events');
+export async function subscribeToEvents(onEvent: (event: AgentEvent) => void, onState?: (state: Partial<SystemStatus>) => void) {
+  const backendUrl = await getBackendUrl();
+  const socketUrl = backendUrl.replace(/^http/, 'ws');
+  const socket = new WebSocket(`${socketUrl}/ws/events`);
 
   socket.addEventListener('message', (message) => {
     const payload = JSON.parse(message.data);
