@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import { Building2 } from "lucide-react";
 import { VenueCard } from "@/components/VenueCard";
-import { events, venues } from "@/lib/mockData";
+import { venues } from "@/lib/mockData";
+import { getApprovedEvents } from "@/lib/server/eventStore";
 
 export const metadata: Metadata = {
   title: "Mekanlar",
   description: "KKTC Events üzerinde doğrulanmış mekanları ve yaklaşan etkinlik sayılarını keşfet."
 };
 
-export default function VenuesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function VenuesPage() {
+  const events = await getApprovedEvents();
+
   return (
     <div className="mx-auto max-w-7xl px-4 pb-10 pt-12 sm:px-6 lg:px-8">
       <section>

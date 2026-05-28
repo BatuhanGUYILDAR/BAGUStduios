@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { CalendarDays, Clock, ExternalLink, MapPin, ShieldCheck, Ticket } from "lucide-react";
 import type { Event } from "@/types/event";
-import { formatPrice } from "@/lib/eventUtils";
+import { formatPrice, formatStatus } from "@/lib/eventUtils";
+import { isRecentlyExpiredEvent } from "@/lib/eventLifecycle";
 import { Badge } from "./Badge";
 import { buttonClasses } from "./Button";
 
@@ -10,6 +11,8 @@ type EventCardProps = {
 };
 
 export function EventCard({ event }: EventCardProps) {
+  const isExpired = isRecentlyExpiredEvent(event);
+
   return (
     <article className="glass-panel festival-ring grid overflow-hidden rounded-[2rem] transition duration-200 hover:-translate-y-1 hover:shadow-festival md:grid-cols-[15rem_1fr] xl:grid-cols-[17rem_1fr_18rem]">
       <Link
@@ -22,6 +25,7 @@ export function EventCard({ event }: EventCardProps) {
         <div className="absolute left-4 top-4 flex flex-wrap gap-2">
           <Badge category={event.category}>{event.category}</Badge>
           {event.featured ? <Badge tone="pink">Öne Çıkan</Badge> : null}
+          {isExpired ? <Badge tone="orange">Süresi doldu</Badge> : null}
         </div>
         <div className="absolute bottom-4 left-4 right-4 text-white">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-white/75">
@@ -41,7 +45,8 @@ export function EventCard({ event }: EventCardProps) {
               Verified
             </Badge>
           ) : null}
-          <Badge status={event.status}>{event.status}</Badge>
+          <Badge status={event.status}>{formatStatus(event.status)}</Badge>
+          {isExpired ? <Badge tone="orange">Süresi doldu</Badge> : null}
           <Badge tone={event.ageLimit === "18+" ? "orange" : "cyan"}>{event.ageLimit}</Badge>
         </div>
 
@@ -61,6 +66,11 @@ export function EventCard({ event }: EventCardProps) {
           </span>
         </div>
         <p className="mt-4 line-clamp-3 text-sm leading-6 text-slatecopy">{event.description}</p>
+        {isExpired ? (
+          <div className="mt-4 rounded-3xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm font-bold leading-6 text-orange-900">
+            Bu etkinliğin süresi doldu. Bilgilendirme için 24 saat boyunca listede kalır.
+          </div>
+        ) : null}
         <p className="mt-4 text-sm font-bold text-ink">Artist / DJ: {event.artist}</p>
       </div>
 
@@ -90,12 +100,16 @@ export function EventCard({ event }: EventCardProps) {
             <ExternalLink aria-hidden="true" size={17} />
           </Link>
           <a
-            className={buttonClasses({ className: "w-full", variant: "secondary" })}
-            href={event.whatsappUrl}
+            aria-disabled={isExpired}
+            className={buttonClasses({
+              className: isExpired ? "w-full pointer-events-none opacity-60" : "w-full",
+              variant: "secondary"
+            })}
+            href={isExpired ? "#" : event.whatsappUrl}
             rel="noreferrer"
             target="_blank"
           >
-            Rezervasyon
+            {isExpired ? "Süresi Doldu" : "Rezervasyon"}
           </a>
         </div>
       </aside>

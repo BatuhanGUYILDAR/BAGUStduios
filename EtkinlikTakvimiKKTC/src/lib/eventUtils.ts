@@ -1,5 +1,5 @@
 import type { Event, EventCategory, EventStatus } from "@/types/event";
-import { MOCK_TODAY_ISO } from "./mockData";
+import { MOCK_TODAY_ISO } from "./eventConstants";
 
 export function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
@@ -35,13 +35,22 @@ export function categoryBadgeClass(category: EventCategory) {
 
 export function statusBadgeClass(status: EventStatus) {
   const classes: Record<EventStatus, string> = {
-    Active: "bg-emerald-100 text-emerald-700 ring-emerald-200",
-    Pending: "bg-amber-100 text-amber-800 ring-amber-200",
-    Cancelled: "bg-rose-100 text-rose-700 ring-rose-200",
-    "Sold Out": "bg-slate-200 text-slate-700 ring-slate-300"
+    approved: "bg-emerald-100 text-emerald-700 ring-emerald-200",
+    pending: "bg-amber-100 text-amber-800 ring-amber-200",
+    rejected: "bg-rose-100 text-rose-700 ring-rose-200"
   };
 
   return classes[status];
+}
+
+export function formatStatus(status: EventStatus) {
+  const labels: Record<EventStatus, string> = {
+    approved: "Approved",
+    pending: "Pending",
+    rejected: "Rejected"
+  };
+
+  return labels[status];
 }
 
 export function isSameMockMonth(dateISO: string) {

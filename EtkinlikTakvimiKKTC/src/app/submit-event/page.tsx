@@ -8,18 +8,7 @@ export const metadata: Metadata = {
     "KKTC Events için frontend-only etkinlik gönderim formu önizlemesi. Gönderiler admin onayı sonrası yayınlanır."
 };
 
-type SubmitEventPageProps = {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
-};
-
-function firstParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
-export default async function SubmitEventPage({ searchParams }: SubmitEventPageProps) {
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const submitted = firstParam(resolvedSearchParams?.submitted) === "1";
-
+export default function SubmitEventPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 pb-10 pt-12 sm:px-6 lg:px-8">
       <section className="mb-8">
@@ -35,7 +24,7 @@ export default async function SubmitEventPage({ searchParams }: SubmitEventPageP
           backend bağlandığında aktif edilebilir.
         </p>
       </section>
-      <SubmitEventForm submitted={submitted} />
+      <SubmitEventForm />
     </div>
   );
 }

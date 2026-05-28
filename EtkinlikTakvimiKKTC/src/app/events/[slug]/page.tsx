@@ -15,8 +15,17 @@ import {
 import { Badge } from "@/components/Badge";
 import { EventList } from "@/components/EventList";
 import { buttonClasses } from "@/components/Button";
-import { events, getEventBySlug, getSimilarEvents, venues } from "@/lib/mockData";
-import { formatPrice } from "@/lib/eventUtils";
+import { venues } from "@/lib/mockData";
+import {
+  getApprovedEventBySlug,
+  getSimilarApprovedEvents
+} from "@/lib/server/eventStore";
+import { formatPrice, formatStatus } from "@/lib/eventUtils";
+import {
+  formatEventDuration,
+  getEventEndDate,
+  isRecentlyExpiredEvent
+} from "@/lib/eventLifecycle";
 
 type EventDetailPageProps = {
   params: Promise<{
@@ -24,13 +33,11 @@ type EventDetailPageProps = {
   }>;
 };
 
-export function generateStaticParams() {
-  return events.map((event) => ({ slug: event.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: EventDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const event = getEventBySlug(slug);
+  const event = await getApprovedEventBySlug(slug);
 
   if (!event) {
     return {
@@ -46,14 +53,19 @@ export async function generateMetadata({ params }: EventDetailPageProps): Promis
 
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
   const { slug } = await params;
-  const event = getEventBySlug(slug);
+  const event = await getApprovedEventBySlug(slug);
 
   if (!event) {
     notFound();
   }
 
   const venue = venues.find((candidate) => candidate.id === event.venueId);
-  const similarEvents = getSimilarEvents(event);
+  const similarEvents = await getSimilarApprovedEvents(event);
+  const isExpired = isRecentlyExpiredEvent(event);
+  const endTime = getEventEndDate(event).toLocaleTimeString("tr-TR", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-10 pt-10 sm:px-6 lg:px-8">
@@ -71,7 +83,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                 </Badge>
               ) : null}
               {event.featured ? <Badge tone="pink">Featured</Badge> : null}
-              <Badge status={event.status}>{event.status}</Badge>
+              <Badge status={event.status}>{formatStatus(event.status)}</Badge>
+              {isExpired ? <Badge tone="orange">Süresi doldu</Badge> : null}
             </div>
             <div>
               <p className="text-sm font-black uppercase tracking-[0.2em] text-white/78">
@@ -90,6 +103,11 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
             <InfoRow icon={MapPin} label="Venue" value={`${event.venueName}, ${event.city}`} />
             <InfoRow icon={CalendarPlus} label="Date" value={event.date} />
             <InfoRow icon={Clock} label="Time" value={event.time} />
+            <InfoRow
+              icon={Clock}
+              label="Duration"
+              value={`${formatEventDuration(event)} / ${endTime} bitti`}
+            />
             <InfoRow icon={Ticket} label="Price range" value={formatPrice(event)} />
             <InfoRow icon={UserRoundCheck} label="Age limit" value={event.ageLimit} />
           </dl>
@@ -97,12 +115,12 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
           <div className="mt-6 grid gap-3">
             <a
               className={buttonClasses({ className: "w-full", variant: "primary" })}
-              href={event.whatsappUrl}
+              href={isExpired ? "#" : event.whatsappUrl}
               rel="noreferrer"
               target="_blank"
             >
               <MessageCircle aria-hidden="true" size={18} />
-              WhatsApp Reservation
+              {isExpired ? "Süresi Doldu" : "WhatsApp Reservation"}
             </a>
             <a
               className={buttonClasses({ className: "w-full", variant: "secondary" })}
@@ -120,6 +138,13 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
           </div>
         </aside>
       </section>
+
+      {isExpired ? (
+        <section className="mt-8 rounded-[2rem] border border-orange-200 bg-orange-50/90 p-5 text-sm font-bold leading-6 text-orange-900 shadow-sm">
+          Bu etkinliğin süresi doldu. Etkinlik, bitiş saatinden sonra 24 saat boyunca bilgilendirme
+          amacıyla görünür kalır; bu sürenin sonunda public siteden otomatik gizlenir.
+        </section>
+      ) : null}
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_24rem]">
         <article className="glass-panel rounded-[2rem] p-6 sm:p-8">

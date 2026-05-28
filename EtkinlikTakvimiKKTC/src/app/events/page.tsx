@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
+import { EventsClient } from "@/components/EventsClient";
 import { EventFilters } from "@/components/EventFilters";
-import { EmptyState } from "@/components/EmptyState";
-import { EventList } from "@/components/EventList";
-import { filterEvents } from "@/lib/filterEvents";
-import { categories, cities, defaultFilters, events } from "@/lib/mockData";
+import { categories, cities, defaultFilters } from "@/lib/eventConstants";
 import type { EventFiltersState } from "@/types/event";
 
 export const metadata: Metadata = {
@@ -64,7 +62,6 @@ function parseInitialFilters(searchParams?: Record<string, string | string[] | u
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const initialFilters = parseInitialFilters(resolvedSearchParams);
-  const filteredEvents = filterEvents(events, initialFilters);
 
   return (
     <div className="pb-8">
@@ -81,9 +78,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         </p>
       </section>
       <div className="grid gap-8">
-        <EventFilters filters={initialFilters} resultCount={filteredEvents.length} />
+        <EventFilters filters={initialFilters} />
         <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          {filteredEvents.length > 0 ? <EventList events={filteredEvents} /> : <EmptyState />}
+          <EventsClient filters={initialFilters} />
         </section>
       </div>
     </div>

@@ -11,7 +11,7 @@ export type EventCategory =
   | "Stand-up"
   | "Workshop";
 
-export type EventStatus = "Active" | "Pending" | "Cancelled" | "Sold Out";
+export type EventStatus = "pending" | "approved" | "rejected";
 
 export interface Event {
   id: string;
@@ -24,6 +24,7 @@ export interface Event {
   date: string;
   dateISO: string;
   time: string;
+  durationHours: number;
   priceMin: number;
   priceMax: number;
   isFree: boolean;
@@ -49,3 +50,45 @@ export type EventFiltersState = {
   age: "Tümü" | "18+";
   sort: "En Yakın Tarih" | "Fiyat Artan" | "Öne Çıkanlar";
 };
+
+export type CreateEventPayload = {
+  title: string;
+  venueName: string;
+  city: City;
+  category: EventCategory;
+  dateISO: string;
+  time: string;
+  priceMin: number;
+  priceMax: number;
+  durationHours?: number;
+  ageLimit: Event["ageLimit"];
+  description: string;
+  artist?: string;
+  instagramUrl?: string;
+  whatsappContact?: string;
+  sourceUrl?: string;
+};
+
+export type AdminEventPatch = Partial<
+  Pick<
+    Event,
+    | "title"
+    | "venueName"
+    | "city"
+    | "category"
+    | "dateISO"
+    | "time"
+    | "durationHours"
+    | "priceMin"
+    | "priceMax"
+    | "ageLimit"
+    | "description"
+    | "artist"
+    | "verified"
+    | "featured"
+    | "status"
+    | "instagramUrl"
+    | "whatsappUrl"
+    | "sourceUrl"
+  >
+>;

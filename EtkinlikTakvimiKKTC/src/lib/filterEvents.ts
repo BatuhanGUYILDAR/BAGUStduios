@@ -1,5 +1,5 @@
 import type { Event, EventFiltersState } from "@/types/event";
-import { MOCK_TODAY_ISO } from "./mockData";
+import { MOCK_TODAY_ISO } from "./eventConstants";
 import { isMockWeekend, isSameMockMonth, normalizeSearch } from "./eventUtils";
 
 export function filterEvents(events: Event[], filters: EventFiltersState) {

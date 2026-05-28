@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Search, SlidersHorizontal } from "lucide-react";
 import type { EventFiltersState } from "@/types/event";
-import { categories, cities } from "@/lib/mockData";
+import { categories, cities } from "@/lib/eventConstants";
 import { buttonClasses } from "./Button";
 
 const dateOptions: EventFiltersState["date"][] = ["Tümü", "Bugün", "Bu Hafta Sonu", "Bu Ay"];
@@ -15,7 +15,7 @@ const sortOptions: EventFiltersState["sort"][] = [
 
 type EventFiltersProps = {
   filters: EventFiltersState;
-  resultCount: number;
+  resultCount?: number;
 };
 
 function SelectField({
@@ -59,7 +59,9 @@ export function EventFilters({ filters, resultCount }: EventFiltersProps) {
                 Filtreler
               </p>
               <p className="mt-1 text-sm font-semibold text-slatecopy" aria-live="polite">
-                {resultCount} etkinlik listeleniyor
+                {typeof resultCount === "number"
+                  ? `${resultCount} etkinlik listeleniyor`
+                  : "Approved etkinlikler API'den listeleniyor"}
               </p>
             </div>
             <div className="flex gap-2">

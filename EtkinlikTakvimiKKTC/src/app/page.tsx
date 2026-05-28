@@ -6,9 +6,12 @@ import { FilterChips } from "@/components/FilterChips";
 import { HeroSection } from "@/components/HeroSection";
 import { StatsCard } from "@/components/StatsCard";
 import { buttonClasses } from "@/components/Button";
-import { events } from "@/lib/mockData";
+import { getApprovedEvents } from "@/lib/server/eventStore";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const events = await getApprovedEvents();
   const featuredEvents = events.filter((event) => event.featured).slice(0, 3);
   const previewEvents = [...events]
     .sort((a, b) => a.dateISO.localeCompare(b.dateISO))

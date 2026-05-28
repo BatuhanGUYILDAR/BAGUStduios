@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CalendarDays, MapPin, Sparkles } from "lucide-react";
 import type { Event } from "@/types/event";
 import { formatPrice } from "@/lib/eventUtils";
+import { isRecentlyExpiredEvent } from "@/lib/eventLifecycle";
 import { Badge } from "./Badge";
 import { buttonClasses } from "./Button";
 
@@ -10,6 +11,8 @@ type FeaturedEventCardProps = {
 };
 
 export function FeaturedEventCard({ event }: FeaturedEventCardProps) {
+  const isExpired = isRecentlyExpiredEvent(event);
+
   return (
     <article className="glass-panel festival-ring overflow-hidden rounded-[2rem] transition duration-200 hover:-translate-y-1 hover:shadow-festival">
       <div className="relative h-56 overflow-hidden" style={{ background: event.posterGradient }}>
@@ -20,6 +23,7 @@ export function FeaturedEventCard({ event }: FeaturedEventCardProps) {
             <Sparkles aria-hidden="true" size={13} />
             Premium
           </Badge>
+          {isExpired ? <Badge tone="orange">Süresi doldu</Badge> : null}
         </div>
         <div className="absolute bottom-5 left-5 right-5 text-white">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-white/75">

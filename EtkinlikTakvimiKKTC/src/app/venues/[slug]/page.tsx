@@ -10,7 +10,8 @@ import {
 import { Badge } from "@/components/Badge";
 import { EventList } from "@/components/EventList";
 import { buttonClasses } from "@/components/Button";
-import { getEventsByVenueId, getVenueBySlug, venues } from "@/lib/mockData";
+import { getVenueBySlug, venues } from "@/lib/mockData";
+import { getApprovedEventsByVenueId } from "@/lib/server/eventStore";
 
 type VenueDetailPageProps = {
   params: Promise<{
@@ -21,6 +22,8 @@ type VenueDetailPageProps = {
 export function generateStaticParams() {
   return venues.map((venue) => ({ slug: venue.slug }));
 }
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: VenueDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -46,7 +49,9 @@ export default async function VenueDetailPage({ params }: VenueDetailPageProps) 
     notFound();
   }
 
-  const venueEvents = getEventsByVenueId(venue.id).sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  const venueEvents = (await getApprovedEventsByVenueId(venue.id)).sort((a, b) =>
+    a.dateISO.localeCompare(b.dateISO)
+  );
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-10 pt-10 sm:px-6 lg:px-8">

@@ -1,28 +1,86 @@
+"use client";
+
+import { FormEvent, useState } from "react";
 import { CheckCircle2, ImagePlus, Send } from "lucide-react";
-import { categories, cities } from "@/lib/mockData";
-import type { City, EventCategory } from "@/types/event";
+import { categoryOptions, cityOptions } from "@/lib/eventConstants";
+import type { Event } from "@/types/event";
 import { Button } from "./Button";
 
-type SubmitEventFormProps = {
-  submitted?: boolean;
+type CreateEventResponse = {
+  event?: Event;
+  error?: string;
 };
 
-export function SubmitEventForm({ submitted = false }: SubmitEventFormProps) {
-  const cityOptions = cities.filter((city): city is City => city !== "Tümü");
-  const categoryOptions = categories.filter(
-    (category): category is EventCategory => category !== "Tümü"
-  );
+export function SubmitEventForm() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+
+    if (!form.reportValidity()) {
+      return;
+    }
+
+    const formData = new FormData(form);
+    const payload = {
+      title: String(formData.get("title") ?? ""),
+      venueName: String(formData.get("venueName") ?? ""),
+      city: String(formData.get("city") ?? ""),
+      category: String(formData.get("category") ?? ""),
+      dateISO: String(formData.get("dateISO") ?? ""),
+      time: String(formData.get("time") ?? ""),
+      priceMin: Number(formData.get("priceMin") || 0),
+      priceMax: Number(formData.get("priceMax") || 0),
+      durationHours: Number(formData.get("durationHours") || 6),
+      ageLimit: String(formData.get("ageLimit") ?? ""),
+      description: String(formData.get("description") ?? ""),
+      artist: String(formData.get("artist") ?? ""),
+      instagramUrl: String(formData.get("instagramUrl") ?? ""),
+      whatsappContact: String(formData.get("whatsappContact") ?? "")
+    };
+
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await fetch("/api/events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = (await response.json()) as CreateEventResponse;
+
+      if (!response.ok) {
+        throw new Error(data.error || "Etkinlik gönderilemedi.");
+      }
+
+      setSuccess("Etkinlik gönderildi. Admin onayından sonra yayınlanacaktır.");
+      form.reset();
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Etkinlik gönderilemedi.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <form action="/submit-event" className="glass-panel rounded-[2rem] p-5 sm:p-7" method="get">
-      <input name="submitted" type="hidden" value="1" />
-
-      {submitted ? (
+    <form className="glass-panel rounded-[2rem] p-5 sm:p-7" noValidate onSubmit={handleSubmit}>
+      {success ? (
         <div className="mb-6 flex items-start gap-3 rounded-3xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-800">
           <CheckCircle2 aria-hidden="true" className="mt-0.5 shrink-0" size={22} />
-          <p className="text-sm font-bold">
-            Etkinlik gönderildi. Admin onayından sonra yayınlanacaktır.
-          </p>
+          <p className="text-sm font-bold">{success}</p>
+        </div>
+      ) : null}
+
+      {error ? (
+        <div className="mb-6 rounded-3xl border border-rose-200 bg-rose-50 px-4 py-4 text-sm font-bold text-rose-800">
+          {error}
         </div>
       ) : null}
 
@@ -43,8 +101,15 @@ export function SubmitEventForm({ submitted = false }: SubmitEventFormProps) {
           placeholder="Kategori seç"
           required
         />
-        <TextField label="Date" name="date" required type="date" />
+        <TextField label="Date" name="dateISO" required type="date" />
         <TextField label="Time" name="time" required type="time" />
+        <TextField
+          label="Duration hours"
+          name="durationHours"
+          placeholder="6"
+          required
+          type="number"
+        />
         <TextField label="Price minimum" name="priceMin" placeholder="0" type="number" />
         <TextField label="Price maximum" name="priceMax" placeholder="700" type="number" />
         <SelectField
@@ -54,6 +119,7 @@ export function SubmitEventForm({ submitted = false }: SubmitEventFormProps) {
           placeholder="Yaş limiti seç"
           required
         />
+        <TextField label="Artist / DJ" name="artist" placeholder="DJ veya sanatçı adı" />
         <TextField
           label="Instagram link"
           name="instagramUrl"
@@ -99,9 +165,9 @@ export function SubmitEventForm({ submitted = false }: SubmitEventFormProps) {
         </span>
       </label>
 
-      <Button className="mt-6 w-full sm:w-auto" size="lg" type="submit">
+      <Button className="mt-6 w-full sm:w-auto" disabled={loading} size="lg" type="submit">
         <Send aria-hidden="true" size={19} />
-        Etkinliği Gönder
+        {loading ? "Gönderiliyor..." : "Etkinliği Gönder"}
       </Button>
     </form>
   );
