@@ -31,4 +31,19 @@ export const products: Product[] = [
     marketplaceUrl: 'https://www.fab.com/sellers/BAGU%20Studio',
     featured: true,
   },
+  {
+    id: 'multiplayer-atm-system-persistent-wallet-transaction-log',
+    title: 'Multiplayer ATM System – Persistent Wallet & Transaction Log',
+    shortDescription:
+      'A Blueprint-based multiplayer ATM banking system with persistent wallets and transaction history.',
+    longDescription:
+      'The Multiplayer ATM System is a fully functional Blueprint-based banking solution designed for multiplayer projects. It provides players with their own persistent wallet, allowing them to deposit, withdraw, and manage money through an intuitive ATM interface.\n\nUnlike simple temporary currency systems, all wallet data remains stored and accessible even after players leave the ATM. When they return, their latest balance and complete transaction history are instantly available.\n\nThis system is designed to be easy to integrate, cleanly organized, and suitable for a wide range of multiplayer games.',
+    image: '/images/atm-services-cover.png',
+    youtubeVideoId: 'NkibKLA9KX4',
+    price: 'Fab Marketplace',
+    category: 'Unreal Engine Blueprint System',
+    tags: ['Unreal Engine', 'Blueprint', 'Multiplayer', 'ATM System', 'Persistent Wallet'],
+    marketplaceUrl: 'https://fab.com/s/e9bd0c2bc3fb',
+    featured: true,
+  },
 ];

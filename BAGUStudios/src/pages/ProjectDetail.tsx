@@ -58,7 +58,7 @@ function ProjectDetail() {
           <div>
             <p className="section-kicker">{t.projectDetail.kicker}</p>
             <h2 className="text-3xl font-black text-white sm:text-5xl">{localizedProduct.title}</h2>
-            <p className="mt-6 text-lg leading-8 text-slate-300">{localizedProduct.longDescription}</p>
+            <p className="mt-6 whitespace-pre-line text-lg leading-8 text-slate-300">{localizedProduct.longDescription}</p>
             <div className="mt-6 flex flex-wrap gap-3">
               {localizedProduct.tags.map((tag) => (
                 <SkillBadge key={tag} label={tag} />
