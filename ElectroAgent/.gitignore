@@ -1,7 +1,0 @@
-node_modules/
-.venv/
-dist/
-.data/
-backend/app/data/
-*.log
-*.tsbuildinfo
