@@ -42,7 +42,7 @@ export const products: Product[] = [
     youtubeVideoId: 'NkibKLA9KX4',
     price: 'Fab Marketplace',
     category: 'Unreal Engine Blueprint System',
-    tags: ['Unreal Engine', 'Blueprint', 'Multiplayer', 'ATM System', 'Persistent Wallet'],
+    tags: ['Unreal Engine', 'Blueprint', 'Multiplayer', 'ATM System', 'Wallet', 'Transaction Log','Cash Deposit', 'Cash Withdrawal', 'Atm System'],
     marketplaceUrl: 'https://fab.com/s/e9bd0c2bc3fb',
     featured: true,
   },
