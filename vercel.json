@@ -1,0 +1,12 @@
+{
+  "installCommand": "npm --prefix BAGUStudios install",
+  "buildCommand": "npm --prefix BAGUStudios run build",
+  "outputDirectory": "BAGUStudios/dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
