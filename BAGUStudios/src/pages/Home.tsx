@@ -7,6 +7,13 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { getProducts } from '../services/productService';
 import type { Product } from '../types/Product';
 
+const moduleFloatDelayClasses = [
+  '[animation-delay:0s]',
+  '[animation-delay:0.4s]',
+  '[animation-delay:0.8s]',
+  '[animation-delay:1.2s]',
+];
+
 function Home() {
   const { t } = useLanguage();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -52,7 +59,12 @@ function Home() {
             <div className="relative overflow-hidden rounded-lg border border-white/10 bg-white/5 p-6 shadow-neon backdrop-blur">
               <div className="grid grid-cols-2 gap-4">
                 {t.home.modules.map((module, index) => (
-                  <div key={module.label} className="rounded-lg border border-white/10 bg-black/35 p-5 animate-float" style={{ animationDelay: `${index * 0.4}s` }}>
+                  <div
+                    key={module.label}
+                    className={`rounded-lg border border-white/10 bg-black/35 p-5 animate-float ${
+                      moduleFloatDelayClasses[index % moduleFloatDelayClasses.length]
+                    }`}
+                  >
                     <div className="h-2 w-16 rounded-full bg-neon-green" />
                     <p className="mt-8 text-sm font-bold text-white">{module.label}</p>
                     <p className="mt-2 text-xs leading-5 text-slate-400">{module.description}</p>
