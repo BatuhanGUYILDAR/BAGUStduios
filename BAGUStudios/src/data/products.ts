@@ -2,6 +2,21 @@ import type { Product } from '../types/Product';
 
 export const products: Product[] = [
   {
+    id: 'advanced-multiplayer-heist-security-system',
+    title: 'Advanced Multiplayer Heist & Security System',
+    shortDescription:
+      'A customizable multiplayer Blueprint framework with connected security devices, regional alarms, and access control.',
+    longDescription:
+      'The Advanced Multiplayer Heist & Security System is a customizable Blueprint framework designed for multiplayer gameplay. Its systems work together: cameras and lasers can trigger regional alarms, security states can restrict access, and players can interact with connected devices to overcome security measures.',
+    image: '/images/advanced-multiplayer-heist-security-system.jpg',
+    youtubeVideoId: '8T8PvGJ29JI',
+    price: '39.99$',
+    category: 'Unreal Engine Blueprint System',
+    tags: ['Unreal Engine', 'Blueprint', 'Multiplayer', 'Security System', 'Heist', 'Regional Alarms', 'Access Control'],
+    marketplaceUrl: 'https://www.fab.com/listings/c5c62902-b3f6-4dc3-a1b3-0fbdce7021de',
+    featured: false,
+  },
+  {
     id: 'ghost-vision-system',
     title: 'Ghost Vision System',
     shortDescription:
