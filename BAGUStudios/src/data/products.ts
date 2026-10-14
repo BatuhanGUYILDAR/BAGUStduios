@@ -14,7 +14,7 @@ export const products: Product[] = [
     category: 'Unreal Engine Blueprint System',
     tags: ['Unreal Engine', 'Blueprint', 'Multiplayer', 'Security System', 'Heist', 'Regional Alarms', 'Access Control'],
     marketplaceUrl: 'https://www.fab.com/listings/c5c62902-b3f6-4dc3-a1b3-0fbdce7021de',
-    featured: false,
+    featured: true,
   },
   {
     id: 'ghost-vision-system',
